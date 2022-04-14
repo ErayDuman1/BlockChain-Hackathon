@@ -1,0 +1,324 @@
+﻿@model IWPandDatabase.Models.BlockChains
+
+@{
+    ViewBag.Title = "BlockChain";
+}
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="~/Content/bootstrap.min.css">
+<link rel="stylesheet" href="~/Content/bootstrap-theme.min.css">
+<link rel="stylesheet" href="~/Content/bootstrap-horizon.css">
+<link rel="stylesheet" href="~/Content/ladda-themeless.min.css">
+<link rel="stylesheet" href="~/Content/ie10-viewport-bug-workaround.css">
+<link rel="stylesheet" href="~/Content/blockchain.css">
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scriptsspin.min.js"></script>
+<script src="~/Scripts/ladda.min.js"></script>
+<script src="~/Scripts/ie10-viewport-bug-workaround.js"></script>
+<script src="~/Scripts/sha256.js"></script>
+<script src="~/Scripts/blockchain.js"></script>
+<script>
+    $(function () {
+        setup(1, 1);
+        setup(2, 1);
+        setup(3, 1);
+        setup(4, 1);
+        setup(5, 1);
+    });
+
+    function getText(block, chain) {
+        return $('#block' + block + 'chain' + chain + 'number').val() +
+            $('#block' + block + 'chain' + chain + 'nonce').val() +
+            $('#block' + block + 'chain' + chain + 'data').val() +
+            $('#block' + block + 'chain' + chain + 'previous').val();
+    }
+
+    function setup(block, chain) {
+        updateHash(block, chain);
+        $('#block' + block + 'chain' + chain + 'mineButton').click(function (e) {
+            var l = Ladda.create(this);
+            //e.preventDefault();
+            l.start();
+            setTimeout(function () {
+                mine(block, chain, true);
+                l.stop();
+            }, 250);
+        });
+    }</script>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="container-fluid">
+        <h1>Blockchain</h1>
+        <div class="row row-horizon">
+            <div class="col-xs-7">
+                <div id="block1chain1well">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block1chain1number">Block:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon">#</span>
+                                    @Html.EditorFor(model => model.BlockID, new { htmlAttributes = new { @id = "block1chain1number", @type = "number", @Value = "1", @onchange = "updateChain(1, 1);", @onkeyup = "updateChain(1, 1);", @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.BlockID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block1chain1nonce">Nonce:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Nonce, new { htmlAttributes = new { @id = "block1chain1nonce", @type = "text", @Value = "11316", @onkeyup = "updateChain(1, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Nonce, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block1chain1data">Data:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Data, new { htmlAttributes = new { @id = "block1chain1data", @onkeyup = "updateChain(1, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Data, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block1chain1previous">Prev:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Prev, new { htmlAttributes = new { @id = "block1chain1previous", @type = "text", @Value = "0000000000000000000000000000000000000000000000000000000000000000", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Prev, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block1chain1hash">Hash:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Hash, new { htmlAttributes = new { @id = "block1chain1hash", @type = "text", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Hash, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"><i class="icon-spinner icon-spin icon-large"></i></div>
+                            <div class="col-sm-10">
+                                <button class="btn btn-primary ladda-button" id="block1chain1mineButton" data-style="expand-right">
+                                    <span class="ladda-label">Mine</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-xs-7">
+                <div id="block2chain1well">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block2chain1number">Block:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon">#</span>
+                                    @Html.EditorFor(model => model.BlockID, new { htmlAttributes = new { @id = "block2chain1number", @type = "number", @Value = "2", @onchange = "updateChain(2, 1);", @onkeyup = "updateChain(2, 1);", @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.BlockID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block2chain1nonce">Nonce:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Nonce, new { htmlAttributes = new { @id = "block2chain1nonce", @type = "text", @Value = "35230", @onkeyup = "updateChain(2, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Nonce, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block2chain1data">Data:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Data, new { htmlAttributes = new { @id = "block2chain1data", @onkeyup = "updateChain(2, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Data, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block2chain1previous">Prev:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Prev, new { htmlAttributes = new { @id = "block2chain1previous", @type = "text", @Value = "000015783b764259d382017d91a36d206d0600e2cbb3567748f46a33fe9297cf", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Prev, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block2chain1hash">Hash:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Hash, new { htmlAttributes = new { @id = "block2chain1hash", @type = "text", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Hash, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"><i class="icon-spinner icon-spin icon-large"></i></div>
+                            <div class="col-sm-10">
+                                <button class="btn btn-primary ladda-button" id="block2chain1mineButton" data-style="expand-right">
+                                    <span class="ladda-label">Mine</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-xs-7">
+                <div id="block3chain1well">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block3chain1number">Block:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon">#</span>
+                                    @Html.EditorFor(model => model.BlockID, new { htmlAttributes = new { @id = "block3chain1number", @type = "number", @Value = "3", @onchange = "updateChain(3, 1);", @onkeyup = "updateChain(3, 1);", @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.BlockID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block3chain1nonce">Nonce:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Nonce, new { htmlAttributes = new { @id = "block3chain1nonce", @type = "text", @Value = "12937", @onkeyup = "updateChain(3, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Nonce, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block3chain1data">Data:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Data, new { htmlAttributes = new { @id = "block3chain1data", @onkeyup = "updateChain(3, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Data, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block3chain1previous">Prev:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Prev, new { htmlAttributes = new { @id = "block3chain1previous", @type = "text", @Value = "000012fa9b916eb9078f8d98a7864e697ae83ed54f5146bd84452cdafd043c19", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Prev, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block3chain1hash">Hash:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Hash, new { htmlAttributes = new { @id = "block3chain1hash", @type = "text", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Hash, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"><i class="icon-spinner icon-spin icon-large"></i></div>
+                            <div class="col-sm-10">
+                                <button class="btn btn-primary ladda-button" id="block3chain1mineButton" data-style="expand-right">
+                                    <span class="ladda-label">Mine</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-xs-7">
+                <div id="block4chain1well">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block4chain1number">Block:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon">#</span>
+                                    @Html.EditorFor(model => model.BlockID, new { htmlAttributes = new { @id = "block4chain1number", @type = "number", @Value = "4", @onchange = "updateChain(4, 1);", @onkeyup = "updateChain(4, 1);", @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.BlockID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block4chain1nonce">Nonce:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Nonce, new { htmlAttributes = new { @id = "block4chain1nonce", @type = "text", @Value = "35990", @onkeyup = "updateChain(4, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Nonce, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block4chain1data">Data:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Data, new { htmlAttributes = new { @id = "block4chain1data", @onkeyup = "updateChain(4, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Data, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block4chain1previous">Prev:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Prev, new { htmlAttributes = new { @id = "block4chain1previous", @type = "text", @Value = "0000b9015ce2a08b61216ba5a0778545bf4ddd7ceb7bbd85dd8062b29a9140bf", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Prev, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block4chain1hash">Hash:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Hash, new { htmlAttributes = new { @id = "block4chain1hash", @type = "text", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Hash, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"><i class="icon-spinner icon-spin icon-large"></i></div>
+                            <div class="col-sm-10">
+                                <button class="btn btn-primary ladda-button" id="block4chain1mineButton" data-style="expand-right">
+                                    <span class="ladda-label">Mine</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-xs-7">
+                <div id="block5chain1well">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block5chain1number">Block:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon">#</span>
+                                    @Html.EditorFor(model => model.BlockID, new { htmlAttributes = new { @id = "block5chain1number", @type = "number", @Value = "5", @onchange = "updateChain(5, 1);", @onkeyup = "updateChain(5, 1);", @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.BlockID, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block5chain1nonce">Nonce:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Nonce, new { htmlAttributes = new { @id = "block5chain1nonce", @type = "text", @Value = "56265", @onkeyup = "updateChain(5, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Nonce, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="block5chain1data">Data:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Data, new { htmlAttributes = new { @id = "block5chain1data", @onkeyup = "updateChain(5, 1);", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Data, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block5chain1previous">Prev:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Prev, new { htmlAttributes = new { @id = "block5chain1previous", @type = "text", @Value = "0000ae8bbc96cf89c68be6e10a865cc47c6c48a9ebec3c6cad729646cefaef83", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Prev, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="state">
+                            <label class="col-sm-2 control-label" for="block5chain1hash">Hash:</label>
+                            <div class="col-sm-10">
+                                @Html.EditorFor(model => model.Hash, new { htmlAttributes = new { @id = "block5chain1hash", @type = "text", @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Hash, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"><i class="icon-spinner icon-spin icon-large"></i></div>
+                            <div class="col-sm-10">
+                                <button class="btn btn-primary ladda-button" id="block5chain1mineButton" data-style="expand-right">
+                                    <span class="ladda-label">Mine</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

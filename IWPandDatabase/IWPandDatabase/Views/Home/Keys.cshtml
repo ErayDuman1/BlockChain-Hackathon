@@ -1,0 +1,98 @@
+﻿@model IWPandDatabase.Models.Key
+
+@{
+    ViewBag.Title = "Keys";
+}
+
+<h2>Keys</h2>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/public-key-private-key.css">
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/popper.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/js.cookie.min.js"></script>
+    <script src="~/Scripts/BigInteger.min.js"></script>
+    <script src="~/Scripts/Buffer.js"></script>
+    <script src="~/Scripts/elliptic.js"></script>
+    <script src="~/Scripts/spin.min.js"></script>
+    <script src="~/Scripts/ladda.min.js"></script>
+    <script src="~/Scripts/sha256.js"></script>
+    <script src="~/Scripts/blockchain.js"></script>
+    <script>
+        var EC = elliptic.elliptic().ec;
+        var ec = new EC('secp256k1');
+
+        var keypair = ec.genKeyPair();
+        if (Cookies.get('privateKey')) {
+            keypair = ec.keyFromPrivate(Cookies.get('privateKey'));
+        }
+
+        function update() {
+            var prv = keypair.getPrivate('hex');
+            var pub = keypair.getPublic('hex');
+            $('#privateKey').val(bigInt(prv, 16).toString());
+            $('#publicKey').val(pub);
+            Cookies.set('privateKey', prv.toString());
+            Cookies.set('publicKey', pub.toString());
+        }
+
+        function random() {
+            keypair = ec.genKeyPair();
+            update();
+        }
+
+        $(function () {
+            $('#randomButton').click(random);
+            $('#privateKey').bind('keyup', function () {
+                $('#privateKey').val($('#privateKey').val().replace(/\D/g, ''));
+                keypair = ec.keyFromPrivate(bigInt($('#privateKey').val()).toString(16));
+                update();
+            });
+            update();
+        });
+    </script>
+</head>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Key</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.PublicKey, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.PublicKey, new { htmlAttributes = new { @id = "publicKey", @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.PublicKey, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PrivateKey, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.PrivateKey, new { htmlAttributes = new { @id = "privateKey", @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.PrivateKey, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Random" id="randomButton" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

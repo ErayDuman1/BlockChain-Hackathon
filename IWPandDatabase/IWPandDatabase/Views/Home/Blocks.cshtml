@@ -1,0 +1,96 @@
+﻿@model IWPandDatabase.Models.Blocks
+
+@{
+    ViewBag.Title = "Blocks";
+}
+
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="~/Content/bootstrap.min.css">
+<link rel="stylesheet" href="~/Content/bootstrap-theme.min.css">
+<link rel="stylesheet" href="~/Content/bootstrap-horizon.css">
+<link rel="stylesheet" href="~/Content/ladda-themeless.min.css">
+<link rel="stylesheet" href="~/Content/ie10-viewport-bug-workaround.css">
+<link rel="stylesheet" href="~/Content/blockchain.css">
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/spin.min.js"></script>
+<script src="~/Scripts/ladda.min.js"></script>
+<script src="~/Scripts/ie10-viewport-bug-workaround.js"></script>
+<script src="~/Scripts/sha256.js"></script>
+<script src="~/Scripts/blockchain.js"></script>
+<script>
+    $(function () {
+        mineButtonAnimation(1, 1);
+        updateHash(1, 1);
+    });
+
+    function getText(block, chain) {
+        return $('#block' + block + 'chain' + chain + 'number').val() +
+            $('#block' + block + 'chain' + chain + 'nonce').val() +
+            $('#block' + block + 'chain' + chain + 'data').val();
+    }
+
+    function mineButtonAnimation(block, chain) {
+        $('#block' + block + 'chain' + chain + 'mineButton').click(function () {
+            mine(block, chain, false);
+        });
+    }</script>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+<div class="container">
+    <h1>Block</h1>
+    <div id="block1chain1well">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="block1chain1number">Block:</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <span class="input-group-addon">#</span>
+                        @Html.EditorFor(model => model.BlockID, new { htmlAttributes = new { @id = "block1chain1number", @type = "number", @Value = "1", @onchange = "updateHash(1, 1);", onkeyup = "updateHash(1, 1);", @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.BlockID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="block1chain1nonce">Nonce:</label>
+                <div class="col-sm-10">
+                    @Html.EditorFor(model => model.Nonce, new { htmlAttributes = new { @id = "block1chain1nonce", @type = "text", @Value = "72608", @onkeyup = "updateHash(1, 1);", @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Nonce, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="block1chain1data">Data:</label>
+                <div class="col-sm-10">
+                    @Html.EditorFor(model => model.Data, new { htmlAttributes = new { @id = "block1chain1data", @onkeyup = "updateHash(1, 1);", @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Data, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group" id="state">
+                <label class="col-sm-2 control-label" for="block1chain1hash">Hash:</label>
+                <div class="col-sm-10">
+                    @Html.EditorFor(model => model.Hash, new { htmlAttributes = new { @id = "block1chain1hash", @type = "text", @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Hash, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2"><i class="icon-spinner icon-spin icon-large"></i></div>
+                <div class="col-sm-10">
+                    <button class="btn btn-primary ladda-button" id="block1chain1mineButton" data-style="expand-right">
+                        <span class="ladda-label">Mine</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
